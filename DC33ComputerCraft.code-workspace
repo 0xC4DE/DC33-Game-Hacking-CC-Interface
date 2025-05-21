@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Computer 0",
+			"uri": "craftos-pc://0/"
+		},
+		{
+			"name": "Computer 1",
+			"uri": "craftos-pc://1/"
+		}
+	],
+	"settings": {},
+	"http.systemCertificates": false
+}
