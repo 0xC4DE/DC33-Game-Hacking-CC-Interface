@@ -89,15 +89,15 @@ local file_text = text_container:addLabel()
 local file_list = file_container:addList()
 
 -- parent frame
-file_frame:setSize("{parent.width - 4}", "{ 2 * parent.height / 3 }"):setPosition(3, 2):setBackground(colors.lightGray)
+file_frame:setSize("{parent.width - 4}", "{ 2 * ceil(parent.height / 3) }"):setPosition(3, 2):setBackground(colors.lightGray)
 border(file_frame, colors.gray)
 
 -- frame that holds the text & container that holds list
 -- 2 is for the border, which totally exists I promise
-text_container:setSize("{parent.width - 2}", "{parent.height / 6 }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
+text_container:setSize("{ parent.width - 2 }", "{ ceil(parent.height / 6) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
 contX, contY = text_container:getSize()
 posX, posY = text_container:getRelativePosition()
-file_container:setSize("{parent.width - 2 }", "{4 * parent.height / 6 }"):setPosition(2, math.ceil(posY)+math.ceil(contY)):setBackground(colors.red)
+file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2 }"):setPosition(2, math.ceil(posY)+math.ceil(contY))
 
 -- The actual text
 file_text:setText("Select a file")
@@ -110,7 +110,7 @@ end
 -- Button Init
 local send_button = basalt.create("Button")
 main:addChild(send_button)
-send_button:setSize("{ parent.width/3 }", 3):setPosition("{parent.width - parent.width/3 - 1}", "{parent.height - 3}"):setText("Send"):setBackground(colors.green)
+send_button:setSize("{ ceil(parent.width/3) }", 3):setPosition("{parent.width - ceil(parent.width/3) - 1}", "{parent.height - 3}"):setText("Send"):setBackground(colors.green)
 send_button:onClick(function(element)
     send_file()
     send_button:setText("Sent!")
@@ -118,7 +118,7 @@ end)
 
 local reset_button = basalt.create("Button")
 main:addChild(reset_button)
-reset_button:setSize("{ parent.width/3 }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset"):setBackground(colors.red)
+reset_button:setSize("{ ceil(parent.width/3) }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset"):setBackground(colors.red)
 reset_button:onClick(function(element)
     shell.run("main")
     reset_button:setText("Reset!")
