@@ -94,10 +94,10 @@ border(file_frame, colors.gray)
 
 -- frame that holds the text & container that holds list
 -- 2 is for the border, which totally exists I promise
-text_container:setSize("{ parent.width - 2 }", "{ ceil(parent.height / 6) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
+text_container:setSize("{ parent.width - 2 }", "{ floor(parent.height / 6) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
 contX, contY = text_container:getSize()
 posX, posY = text_container:getRelativePosition()
-file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2 }"):setPosition(2, math.ceil(posY)+math.ceil(contY))
+file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2 }"):setPosition(2, posY+contY+1)
 
 -- The actual text
 file_text:setText("Select a file")
