@@ -6,7 +6,12 @@ local puzzle_label = "puzzle1"
 local basalt = require("basalt")
 
 -- Get monitor and sizes
-local monitor = peripheral.find("monitor") -- can use .getSize()
+local monitor = nil
+if peripheral.find("monitor") then
+    monitor = peripheral.find("monitor") -- can use .getSize()
+else
+    monitor = term.current()
+end
 width, height = monitor.getSize()
 width = width - 2
 height = height - 2
@@ -69,7 +74,7 @@ border(file_frame, colors.gray)
 -- Button Init
 local send_button = basalt.create("Button")
 main:addChild(send_button)
-send_button:setSize(15, 3):setPosition(width-15, "{parent.height - 3}"):setText("Send"):setBackground(colors.green)
+send_button:setSize("{ parent.width/3 }", 3):setPosition("{parent.width - parent.width/3 - 1}", "{parent.height - 3}"):setText("Send"):setBackground(colors.green)
 send_button:onClick(function(element)
     send_file()
     send_button:setText("Sent!")
@@ -77,7 +82,7 @@ end)
 
 local reset_button = basalt.create("Button")
 main:addChild(reset_button)
-reset_button:setSize(15,3):setPosition(4, "{parent.height - 3}"):setText("Reset Puzzle"):setBackground(colors.red)
+reset_button:setSize("{ parent.width/3 }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset Puzzle"):setBackground(colors.red)
 reset_button:onClick(function(element)
     shell.run("main")
     reset_button:setText("Reset!")
