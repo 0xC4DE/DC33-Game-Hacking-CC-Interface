@@ -8,7 +8,7 @@ local basalt = require("basalt")
 -- Get monitor and sizes
 local monitor = nil
 if peripheral.find("monitor") then
-    monitor = peripheral.find("monitor") -- can use .getSize()
+    monitor = peripheral.find("monitor")
 else
     monitor = term.current()
 end
@@ -48,6 +48,8 @@ local function border(element, borderColor)
     local canvas = element:getCanvas()
     canvas:addCommand(function(self)
         local width, height = self.get("width"), self.get("height")
+        width = math.floor(width)
+        height = math.floor(height)
         local bg = self.get("background")
         -- Lines:
         self:textFg(1, 1, ("\131"):rep(width), borderColor)
@@ -63,13 +65,47 @@ local function border(element, borderColor)
     end)
 end
 
+
+local function list_files()
+    local files = fs.list("/")
+    local ret_files = {}
+    for k, v in pairs(files) do
+        if v:sub(-3) == "lua" then
+            table.insert(ret_files, v)
+        end
+    end
+    return ret_files
+end
+
 -- Create the main frame
 local main = basalt.createFrame():setTerm(monitor)
 
 -- File Picker frame
 local file_frame = main:addFrame()
-file_frame:setSize("{parent.width - 4}", "{parent.height - 6}"):setPosition(3, 2):setBackground(colors.red)
+local text_container = file_frame:addContainer()
+local file_container = file_frame:addContainer()
+
+local file_text = text_container:addLabel()
+local file_list = file_container:addList()
+
+-- parent frame
+file_frame:setSize("{parent.width - 4}", "{ 2 * parent.height / 3 }"):setPosition(3, 2):setBackground(colors.lightGray)
 border(file_frame, colors.gray)
+
+-- frame that holds the text & container that holds list
+-- 2 is for the border, which totally exists I promise
+text_container:setSize("{parent.width - 2}", "{parent.height / 6 }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
+contX, contY = text_container:getSize()
+posX, posY = text_container:getRelativePosition()
+file_container:setSize("{parent.width - 2 }", "{4 * parent.height / 6 }"):setPosition(2, math.ceil(posY)+math.ceil(contY)):setBackground(colors.red)
+
+-- The actual text
+file_text:setText("Select a file")
+
+-- Frame that holds the selectable list, and the list itself
+for k,v in pairs(list_files()) do
+    file_list:addItem(v)
+end
 
 -- Button Init
 local send_button = basalt.create("Button")
@@ -82,7 +118,7 @@ end)
 
 local reset_button = basalt.create("Button")
 main:addChild(reset_button)
-reset_button:setSize("{ parent.width/3 }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset Puzzle"):setBackground(colors.red)
+reset_button:setSize("{ parent.width/3 }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset"):setBackground(colors.red)
 reset_button:onClick(function(element)
     shell.run("main")
     reset_button:setText("Reset!")
