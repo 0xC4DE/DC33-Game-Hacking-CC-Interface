@@ -89,12 +89,12 @@ local file_text = text_container:addLabel()
 local file_list = file_container:addList()
 
 -- parent frame
-file_frame:setSize("{parent.width - 4}", "{ 2 * ceil(parent.height / 3) }"):setPosition(3, 2):setBackground(colors.lightGray)
+file_frame:setSize("{parent.width - 4}", "{ ceil(parent.height / 2) }"):setPosition(3, "{ floor(parent.height/3) - 1 }"):setBackground(colors.lightGray)
 border(file_frame, colors.gray)
 
 -- frame that holds the text & container that holds list
 -- 2 is for the border, which totally exists I promise
-text_container:setSize("{ parent.width - 2 }", "{ floor(parent.height / 6) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
+text_container:setSize("{ parent.width - 2 }", "{ floor(parent.height / 8) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
 contX, contY = text_container:getSize()
 posX, posY = text_container:getRelativePosition()
 file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2 }"):setPosition(2, posY+contY+1)
@@ -102,6 +102,7 @@ file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2
 -- The actual text
 file_text:setText("Select a file")
 
+file_list:setSize("{ parent.width }", "{parent.height}")
 -- Frame that holds the selectable list, and the list itself
 for k,v in pairs(list_files()) do
     file_list:addItem(v)
