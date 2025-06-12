@@ -121,7 +121,13 @@ local reset_button = basalt.create("Button")
 main:addChild(reset_button)
 reset_button:setSize("{ ceil(parent.width/3) }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset"):setBackground(colors.red)
 reset_button:onClick(function(element)
-    shell.run("main")
+    receiver = rednet.lookup("reset", puzzle_label)
+    if not receiver then
+        error("Receiver not found " .. receiver)
+        reset_button:setText("Error!!")
+        return
+    end
+    rednet.send(receiver, "", "reset")
     reset_button:setText("Reset!")
 end)
 

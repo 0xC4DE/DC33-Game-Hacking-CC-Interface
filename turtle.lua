@@ -6,7 +6,7 @@ set to receive a solution for a puzzle.
 Luckily, structure blocks replicate scripts! So as long as the turtle is tagged, it can receive puzzle solutions
 
 !! It's notable that the name of the turtle needs to be changed, it needs to match that on the sending computer !!
-!! label set puzzlex !!
+!! label set turtle_puzzlex !!
 
 This label is used to listen/receive relevant commands
 
