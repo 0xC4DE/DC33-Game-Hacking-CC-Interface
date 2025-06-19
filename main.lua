@@ -80,6 +80,24 @@ end
 -- Create the main frame
 local main = basalt.createFrame():setTerm(monitor)
 
+-- Puzzle Selection Buttons
+local puzzle_select = main:addContainer()
+puzzle_select:setPosition(1,1):setSize("{parent.width}", 1):setBackground(colors.lightGray)
+local puzzle_label = puzzle_select:addLabel():setText("Select Puzzle"):setPosition(1,1):setWidth("{self.text:len() + 2}")
+local puzzle1_button = puzzle_select:addButton()
+puzzle1_button:setText("1"):setSize("{self.text:len()+2}", 1):setPosition(puzzle_label.text:len()+2, 1):setBackground(colors.green)
+
+local puzzle_buttons = {puzzle1_button}
+local button_width = puzzle1_button.text:len()+2
+local current_x = puzzle1_button.x
+local current_row = 1
+for i = 0, 8 do
+    local button = puzzle_select:addButton():setSize(button_width, 1):setText(tostring(i+2)):setBackground(colors.gray)
+    current_x = current_x + button_width
+    button:setPosition(current_x, 1)
+    table.insert(puzzle_buttons, button)
+end
+
 -- File Picker frame
 local file_frame = main:addFrame()
 local text_container = file_frame:addContainer()
@@ -101,8 +119,8 @@ file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2
 
 -- The actual text
 file_text:setText("Select a file")
+file_list:setSize("{ parent.width }", "{ parent.height }")
 
-file_list:setSize("{ parent.width }", "{parent.height}")
 -- Frame that holds the selectable list, and the list itself
 for k,v in pairs(list_files()) do
     file_list:addItem(v)
