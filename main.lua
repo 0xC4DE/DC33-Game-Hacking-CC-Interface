@@ -1,4 +1,3 @@
-
 -- !! CHANGEME !!
 local puzzle_label = "puzzle1"
 
@@ -15,7 +14,6 @@ end
 width, height = monitor.getSize()
 width = width - 2
 height = height - 2
-
 
 peripheral.find("modem", rednet.open)
 rednet.host("files", "pc")
@@ -82,19 +80,27 @@ local main = basalt.createFrame():setTerm(monitor)
 
 -- Puzzle Selection Buttons
 local puzzle_select = main:addContainer()
-puzzle_select:setPosition(1,1):setSize("{parent.width}", 1):setBackground(colors.lightGray)
-local puzzle_label = puzzle_select:addLabel():setText("Select Puzzle"):setPosition(1,1):setWidth("{self.text:len() + 2}")
+puzzle_select:setPosition(1,1):setSize("{parent.width}", 2):setBackground(colors.lightGray)
+local puzzle_label = puzzle_select:addLabel():setText("Select Puzzle"):setPosition(1,1):setWidth("{self.text:len() + 1}")
 local puzzle1_button = puzzle_select:addButton()
-puzzle1_button:setText("1"):setSize("{self.text:len()+2}", 1):setPosition(puzzle_label.text:len()+2, 1):setBackground(colors.green)
+puzzle1_button:setText("1")
+local button_width = puzzle1_button.text:len()+2
+puzzle1_button:setSize(button_width, 1):setPosition(1, 2):setBackground(colors.green)
 
 local puzzle_buttons = {puzzle1_button}
-local button_width = puzzle1_button.text:len()+2
-local current_x = puzzle1_button.x
+local current_x = 1
+local current_y = 2
 local current_row = 1
 for i = 0, 8 do
-    local button = puzzle_select:addButton():setSize(button_width, 1):setText(tostring(i+2)):setBackground(colors.gray)
+    local button = puzzle_select:addButton():setSize(button_width, 1):setBackground(colors.gray)
+    button:setText(tostring(i+2))
     current_x = current_x + button_width
-    button:setPosition(current_x, 1)
+    if current_x > width then
+        current_x = 1
+        current_y = current_y + 1
+        puzzle_select:setHeight(current_y)
+    end
+    button:setPosition(current_x, current_y)
     table.insert(puzzle_buttons, button)
 end
 
