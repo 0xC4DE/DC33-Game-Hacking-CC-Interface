@@ -1,8 +1,6 @@
--- !! CHANGEME !!
-local puzzle_label = "puzzle1"
-
 -- Computer Craft DC33 main computer sender and "grader" with screen
-local basalt = require("basalt")
+local puzzleString = "puzzle"
+local selectedPuzzle = "1"
 
 -- Get monitor and sizes
 local monitor = nil
@@ -11,7 +9,31 @@ if peripheral.find("monitor") then
 else
     monitor = term.current()
 end
-width, height = monitor.getSize()
+
+if not monitor then
+    error("Monitor not found?")
+end
+
+-- Basalt initialization stuff
+local basalt = require("basalt")
+local main = basalt.getMainFrame():setTerm(monitor)
+local submitResetBox = main:addContainer()
+local sendButton = submitResetBox:addButton()
+local resetButton = submitResetBox:addButton()
+
+-- Puzzle Selection Buttons
+local puzzleSelect = main:addContainer()
+local _puzzleLabel = puzzleSelect:addLabel():setText("Select Puzzle"):setPosition(3,1):setWidth("{self.text:len() + 1}")
+local puzzle1Button = puzzleSelect:addButton()
+puzzleSelect:setPosition(1,1):setSize("{parent.width}", "{ceil(parent.height/12)}"):setBackground(colors.lightGray)
+
+puzzle1Button:setText("1")
+local buttonWidth = puzzle1Button.text:len()+2
+puzzle1Button:setSize(buttonWidth, 1):setPosition(3, 2):setBackground(colors.green)
+
+local puzzleButtons = {puzzle1Button}
+
+local width, height = monitor.getSize()
 width = width - 2
 height = height - 2
 
@@ -19,8 +41,8 @@ peripheral.find("modem", rednet.open)
 rednet.host("files", "pc")
 
 -- File Sending Logic
-local function send_file()
-    local turtle = rednet.lookup("files", puzzle_label)
+local function sendFile()
+    local turtle = rednet.lookup("files", puzzleString..selectedPuzzle)
     if turtle == nil then
         print("Unable to locate the receiver!")
         return false
@@ -28,15 +50,33 @@ local function send_file()
 
     -- TODO: File Picker
     local file = fs.open("testfile.lua", "r")
-    local data = file.readAll()
-    file.close()
-    rednet.send(turtle, data, "file_upload")
+    if file then
+        local data = file.readAll()
+        if not data then
+
+            return
+        end
+        file.close()
+        rednet.send(turtle, data, "file_upload")
+    end
+end
+
+-- Reset Logic
+local function sendReset()
+    local receiver = rednet.lookup("reset", puzzleString..selectedPuzzle)
+    if not receiver then
+        error("Receiver not found " .. receiver)
+        resetButton:setText("Error!!")
+        return
+    end
+    rednet.send(receiver, "", "reset")
+    resetButton:setText("Reset!")
 end
 
 local colorHex = {}
 for i = 0, 15 do
-    colorHex[2^i] = ("%x"):format(i)
-    colorHex[("%x"):format(i)] = 2^i
+colorHex[2^i] = ("%x"):format(i)
+colorHex[("%x"):format(i)] = 2^i
 end
 
 --- This is the border function, it takes the element and the color of the border as arguments
@@ -75,84 +115,72 @@ local function list_files()
     return ret_files
 end
 
--- Create the main frame
-local main = basalt.createFrame():setTerm(monitor)
-
--- Puzzle Selection Buttons
-local puzzle_select = main:addContainer()
-puzzle_select:setPosition(1,1):setSize("{parent.width}", 2):setBackground(colors.lightGray)
-local puzzle_label = puzzle_select:addLabel():setText("Select Puzzle"):setPosition(1,1):setWidth("{self.text:len() + 1}")
-local puzzle1_button = puzzle_select:addButton()
-puzzle1_button:setText("1")
-local button_width = puzzle1_button.text:len()+2
-puzzle1_button:setSize(button_width, 1):setPosition(1, 2):setBackground(colors.green)
-
-local puzzle_buttons = {puzzle1_button}
-local current_x = 1
-local current_y = 2
-local current_row = 1
-for i = 0, 8 do
-    local button = puzzle_select:addButton():setSize(button_width, 1):setBackground(colors.gray)
-    button:setText(tostring(i+2))
-    current_x = current_x + button_width
-    if current_x > width then
-        current_x = 1
-        current_y = current_y + 1
-        puzzle_select:setHeight(current_y)
-    end
-    button:setPosition(current_x, current_y)
-    table.insert(puzzle_buttons, button)
+local currentX = 3
+local currentY = 2
+local function selectPuzzleButton(element) 
+    puzzleButtons[tonumber(selectedPuzzle)]:setBackground(colors.gray)
+    element:setBackground(colors.green)
+    selectedPuzzle = element:getText()
 end
 
--- File Picker frame
-local file_frame = main:addFrame()
-local text_container = file_frame:addContainer()
-local file_container = file_frame:addContainer()
+-- Creates interactable puzzle upload buttons
+for i = 0, 8 do
+    local button = puzzleSelect:addButton():setSize(buttonWidth, 1):setBackground(colors.gray)
+    button:setText(tostring(i+2))
+    currentX = currentX + buttonWidth
+    if currentX > width then
+        currentX = 3
+        currentY = currentY + 1
+        puzzleSelect:setHeight(currentY)
+    end
+    button:setPosition(currentX, currentY)
+    table.insert(puzzleButtons, button)
+end
 
-local file_text = text_container:addLabel()
-local file_list = file_container:addList()
+for i, button in pairs(puzzleButtons) do
+    button:onClick(selectPuzzleButton)
+end
 
--- parent frame
-file_frame:setSize("{parent.width - 4}", "{ ceil(parent.height / 2) }"):setPosition(3, "{ floor(parent.height/3) - 1 }"):setBackground(colors.lightGray)
-border(file_frame, colors.gray)
+
+-- File Picker frame initilization
+local fileFrame = main:addFrame()
+local textContainer = fileFrame:addContainer()
+local fileContainer = fileFrame:addContainer()
+
+local fileText = textContainer:addLabel()
+local fileList = fileContainer:addList()
+
+--  file picker parent frame sizing
+fileFrame:setSize("{parent.width - 4}", "{ ceil(parent.height / 2) }"):setPosition(3, "{ floor(parent.height/3) - 1 }"):setBackground(colors.lightGray)
+border(fileFrame, colors.gray)
 
 -- frame that holds the text & container that holds list
 -- 2 is for the border, which totally exists I promise
-text_container:setSize("{ parent.width - 2 }", "{ floor(parent.height / 8) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
-contX, contY = text_container:getSize()
-posX, posY = text_container:getRelativePosition()
-file_container:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2 }"):setPosition(2, posY+contY+1)
+textContainer:setSize("{ parent.width - 2 }", "{ floor(parent.height / 8) }"):setPosition(2, 2):setBackground(colors.lightGray):prioritize()
+local _contX, contY = textContainer:getSize()
+local _posX, posY = textContainer:getRelativePosition()
+fileContainer:setSize("{ parent.width - 2 }", "{4 * ceil(parent.height / 6) - 2}"):setPosition(2, posY+contY+1)
 
 -- The actual text
-file_text:setText("Select a file")
-file_list:setSize("{ parent.width }", "{ parent.height }")
+fileText:setText("Select a file")
+fileList:setSize("{ parent.width }", "{ parent.height }")
 
 -- Frame that holds the selectable list, and the list itself
-for k,v in pairs(list_files()) do
-    file_list:addItem(v)
+for _k,v in pairs(list_files()) do
+    fileList:addItem(v)
 end
 
--- Button Init
-local send_button = basalt.create("Button")
-main:addChild(send_button)
-send_button:setSize("{ ceil(parent.width/3) }", 3):setPosition("{parent.width - ceil(parent.width/3) - 1}", "{parent.height - 3}"):setText("Send"):setBackground(colors.green)
-send_button:onClick(function(element)
-    send_file()
-    send_button:setText("Sent!")
+-- Button Initialization stuff
+submitResetBox:setSize("{parent.width}", "{ceil(parent.height / 6)}"):setPosition(1, "{parent.height-2}")
+sendButton:setSize("{ ceil(parent.width/4) }", 1):setPosition("{ parent.width - self.width - 2 }", "{ parent.height - 2 }"):setText("Send"):setBackground(colors.green)
+sendButton:onClick(function(element)
+    sendFile()
+    sendButton:setText("Sent!")
 end)
 
-local reset_button = basalt.create("Button")
-main:addChild(reset_button)
-reset_button:setSize("{ ceil(parent.width/3) }", 3):setPosition(3, "{parent.height - 3}"):setText("Reset"):setBackground(colors.red)
-reset_button:onClick(function(element)
-    receiver = rednet.lookup("reset", puzzle_label)
-    if not receiver then
-        error("Receiver not found " .. receiver)
-        reset_button:setText("Error!!")
-        return
-    end
-    rednet.send(receiver, "", "reset")
-    reset_button:setText("Reset!")
+resetButton:setSize("{ ceil(parent.width/4) }", 1):setPosition(3, "{ parent.height - 2 }"):setText("Reset"):setBackground(colors.red)
+resetButton:onClick(function(element)
+    sendReset()
 end)
 
 basalt.run()
