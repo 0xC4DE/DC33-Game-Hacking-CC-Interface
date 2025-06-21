@@ -1,0 +1,1 @@
+This folder contains a lot of various scripts that help me produce things like in-game demos that wont get interrupted, text screens, and anything else that I dont care to categorize further.
