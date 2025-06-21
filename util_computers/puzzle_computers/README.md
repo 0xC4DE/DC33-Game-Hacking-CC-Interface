@@ -1,0 +1,1 @@
+This file contains the files relating to the grading of puzzles, placement/coordinates rely on each puzzle being built correctly. Generally the command computer is to be placed underneith the first block of the puzzle.
