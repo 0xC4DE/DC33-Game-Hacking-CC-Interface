@@ -1,6 +1,7 @@
 -- Computer Craft DC33 main computer sender and "grader" with screen
 local puzzleString = "puzzle"
 local selectedPuzzle = "1"
+local selectedFile
 
 -- Get monitor and sizes
 local monitor = nil
@@ -25,8 +26,17 @@ local resetButton = submitResetBox:addButton()
 local puzzleSelect = main:addContainer()
 local _puzzleLabel = puzzleSelect:addLabel():setText("Select Puzzle"):setPosition(3,1):setWidth("{self.text:len() + 1}")
 local puzzle1Button = puzzleSelect:addButton()
-puzzleSelect:setPosition(1,1):setSize("{parent.width}", "{ceil(parent.height/12)}"):setBackground(colors.lightGray)
 
+-- File Picker frame initilization
+local fileFrame = main:addFrame()
+local textContainer = fileFrame:addContainer()
+local fileContainer = fileFrame:addContainer()
+
+local fileText = textContainer:addLabel()
+local fileList = fileContainer:addList()
+
+-- Back to puzzle select
+puzzleSelect:setPosition(1,1):setSize("{parent.width}", "{ceil(parent.height/12)}"):setBackground(colors.lightGray)
 puzzle1Button:setText("1")
 local buttonWidth = puzzle1Button.text:len()+2
 puzzle1Button:setSize(buttonWidth, 1):setPosition(3, 2):setBackground(colors.green)
@@ -42,22 +52,23 @@ rednet.host("files", "pc")
 
 -- File Sending Logic
 local function sendFile()
-    local turtle = rednet.lookup("files", puzzleString..selectedPuzzle)
-    if turtle == nil then
-        print("Unable to locate the receiver!")
+    local computer = rednet.lookup("files", puzzleString..selectedPuzzle)
+    sendButton:setText("Sending...")
+    if computer == nil then
+        sendButton:setText("Error!")
         return false
     end
 
-    -- TODO: File Picker
-    local file = fs.open("testfile.lua", "r")
+    -- Probably guaranteed to be a file, whatever, lol.
+    local file = fs.open(fileList:getSelectedItem()["text"], "r")
     if file then
         local data = file.readAll()
         if not data then
-
+            sendButton:setText("File Error!")
             return
         end
         file.close()
-        rednet.send(turtle, data, "file_upload")
+        rednet.send(computer, data, "files")
     end
 end
 
@@ -65,8 +76,7 @@ end
 local function sendReset()
     local receiver = rednet.lookup("reset", puzzleString..selectedPuzzle)
     if not receiver then
-        error("Receiver not found " .. receiver)
-        resetButton:setText("Error!!")
+        resetButton:setText("Error!")
         return
     end
     rednet.send(receiver, "", "reset")
@@ -142,14 +152,6 @@ for i, button in pairs(puzzleButtons) do
 end
 
 
--- File Picker frame initilization
-local fileFrame = main:addFrame()
-local textContainer = fileFrame:addContainer()
-local fileContainer = fileFrame:addContainer()
-
-local fileText = textContainer:addLabel()
-local fileList = fileContainer:addList()
-
 --  file picker parent frame sizing
 fileFrame:setSize("{parent.width - 4}", "{ ceil(parent.height / 2) }"):setPosition(3, "{ floor(parent.height/3) - 1 }"):setBackground(colors.lightGray)
 border(fileFrame, colors.gray)
@@ -174,8 +176,9 @@ end
 submitResetBox:setSize("{parent.width}", "{ceil(parent.height / 6)}"):setPosition(1, "{parent.height-2}")
 sendButton:setSize("{ ceil(parent.width/4) }", 1):setPosition("{ parent.width - self.width - 2 }", "{ parent.height - 2 }"):setText("Send"):setBackground(colors.green)
 sendButton:onClick(function(element)
-    sendFile()
-    sendButton:setText("Sent!")
+    if sendFile() then
+        sendButton:setText("Sent!")
+    end
 end)
 
 resetButton:setSize("{ ceil(parent.width/4) }", 1):setPosition(3, "{ parent.height - 2 }"):setText("Reset"):setBackground(colors.red)

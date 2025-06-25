@@ -1,3 +1,12 @@
+
+--[[
+This is the command computer interface, somewhat of a generalized file, since puzzle 1 is simple enough to be duplicated/replicated.
+
+The turtle will be duplicated directly by the command, if all goes well and reset works right, it will also destroy the computer.
+If the user figures out a way to directly remote control the turtle, awesome lol
+
+]]--
+
 local puzzle_label = "puzzle1"
 local puzzle_complete = false
 
@@ -7,18 +16,23 @@ rednet.open(peripheral.getName(peripheral.find("modem")))
 peripheral.find("modem", rednet.open)
 
 -- Ensure hosting rednet with hostname relevant to the puzzle
---rednet.host("files", puzzle_label)
+rednet.host("files", puzzle_label)
 rednet.host("reset", puzzle_label)
 
 
 -- receive file function
 local function receive_file(data)
     print("Sending received program to turtle")
-    rednet.send("turtle_"..puzzle_label, data)
+    fs.delete("/disk/startup") 
+    local file = fs.open("/disk/startup", "w")
+    file.write(data)
+    commands.exec("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:10,ComputerId:1000}")
+    commands.exec("computercraft turn-on 1000")
     return true
 end
 
 local function receive_reset_request() 
+    commands.exec("computercraft shutdown 1000")
     print("I'm resetting really hard rn")
     return true
 end
@@ -27,15 +41,27 @@ end
 local function check_puzzle_complete() 
     -- implement custom puzzle completion logic per-puzzle
     while not puzzle_complete do
-        --print("Puzzle isn't complete!")
+        x, y, z = commands.getBlockPosition()
+        y = y + 2
+        z = z - 3
+        block = commands.getBlockInfo(x, y, z)
+        if block ~= nil then
+            if block["name"] ~= "minecraft:air" then
+                -- TODO: Central computer that can control if a puzzle is complete
+                puzzle_complete = true
+                print("Puzzle completed!!")
+            end
+        end
         sleep(1)
     end
+    return true
 end 
 
 -- Receive any protocol
 local function receive_protocol()
     while true do
         local id, data, proto = rednet.receive()
+        print("Received protocol "..proto)
         if proto == "files" then
             receive_file(data)
         elseif proto == "reset" then
@@ -45,4 +71,5 @@ local function receive_protocol()
 end
 
 -- Wait for file, reset, or if a success state is reached
+print("Waiting to receive protocols...")
 parallel.waitForAny(receive_protocol, check_puzzle_complete)
