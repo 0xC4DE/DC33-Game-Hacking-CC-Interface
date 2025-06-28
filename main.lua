@@ -1,6 +1,7 @@
 -- Computer Craft DC33 main computer sender and "grader" with screen
 local puzzleString = "puzzle"
 local selectedPuzzle = "1"
+local filesHosts = {}
 local selectedFile
 
 -- Get monitor and sizes
@@ -48,39 +49,65 @@ width = width - 2
 height = height - 2
 
 peripheral.find("modem", rednet.open)
-rednet.host("files", "pc")
 
 -- File Sending Logic
+local sendButtonEnabled = true
+local sendTimerId = nil
 local function sendFile()
-    local computer = rednet.lookup("files", puzzleString..selectedPuzzle)
-    sendButton:setText("Sending...")
+    if not sendButtonEnabled then 
+        return
+    end
+
+    sendButton:setText("Sending..."):setBackground(colors.gray):setWidth("{self.text:len()+2}")
+    sendButtonEnabled = false
+
+    local computer = filesHosts[tonumber(selectedPuzzle)]
+    print(filesHosts[1])
     if computer == nil then
-        sendButton:setText("Error!")
-        return false
+        sendButton:setText("Error!"):setBackground(colors.red):setWidth("{self.text:len()+2}")
+        sendTimerId = os.startTimer(3)
+        return
     end
 
     -- Probably guaranteed to be a file, whatever, lol.
-    local file = fs.open(fileList:getSelectedItem()["text"], "r")
-    if file then
+    if fileList:getSelectedItem() then
+        local file = fs.open(fileList:getSelectedItem()["text"], "r")
         local data = file.readAll()
         if not data then
-            sendButton:setText("File Error!")
+            sendButton:setText("File Error!"):setBackground(color.red)
+            sendTimerId = os.startTimer(3)
+            file.close()
             return
         end
         file.close()
         rednet.send(computer, data, "files")
+    else
+        sendButton:setText("Select a file!"):setWidth("{self.text:len()+2}"):setBackground(colors.red)
+        sendTimerId = os.startTimer(3)
     end
+
+    sendButton:setText("Sent!"):setBackground(color.green)
+    sendTimerId = os.startTimer(3)
 end
 
 -- Reset Logic
+local resetTimerId = nil -- impossible start number
+local resetButtonEnabled = true
 local function sendReset()
+    if not resetButtonEnabled then
+        return
+    end
+    resetButton:setText("Sending...")
+    resetButton:setBackground(colors.gray)
     local receiver = rednet.lookup("reset", puzzleString..selectedPuzzle)
     if not receiver then
-        resetButton:setText("Error!")
+        resetButton:setText("Error!"):setBackground(colors.red)
         return
     end
     rednet.send(receiver, "", "reset")
     resetButton:setText("Reset!")
+    resetButtonEnabled = false
+    resetTimerId = os.startTimer(3)
 end
 
 local colorHex = {}
@@ -186,4 +213,34 @@ resetButton:onClick(function(element)
     sendReset()
 end)
 
-basalt.run()
+function resetTextEvent()
+    while true do
+        local event = nil
+        local event, id = os.pullEvent()
+        if event == "timer" then
+            if id == resetTimerId then
+                resetButton:setText("Reset"):setBackground(colors.red)
+                resetButtonEnabled = true
+            elseif id == sendTimerId then
+                sendButton:setText("Send"):setBackground(colors.green):setWidth("{ ceil(parent.width)/4 }")
+                sendButtonEnabled = true
+            end
+        end
+    end
+end
+
+function rednetComputers()
+    local funcs = {}
+    for i=1, 10 do
+        local f = (function() table.insert(filesHosts, tostring(i), rednet.lookup("files", "puzzle"..i)) end)
+        table.insert(funcs, f)
+    end
+    parallel.waitForAll(unpack(funcs))
+    for k,v in pairs(filesHosts) do
+        print(k, v)
+    end    
+end
+
+rednetComputers()
+
+parallel.waitForAny(resetTextEvent, basalt.run)
