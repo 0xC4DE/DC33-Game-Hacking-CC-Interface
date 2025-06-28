@@ -61,8 +61,7 @@ local function sendFile()
     sendButton:setText("Sending..."):setBackground(colors.gray):setWidth("{self.text:len()+2}")
     sendButtonEnabled = false
 
-    local computer = filesHosts[tonumber(selectedPuzzle)]
-    print(filesHosts[1])
+    local computer = filesHosts[selectedPuzzle]
     if computer == nil then
         sendButton:setText("Error!"):setBackground(colors.red):setWidth("{self.text:len()+2}")
         sendTimerId = os.startTimer(3)
@@ -74,7 +73,7 @@ local function sendFile()
         local file = fs.open(fileList:getSelectedItem()["text"], "r")
         local data = file.readAll()
         if not data then
-            sendButton:setText("File Error!"):setBackground(color.red)
+            sendButton:setText("File Error!"):setBackground(colors.red)
             sendTimerId = os.startTimer(3)
             file.close()
             return
@@ -232,15 +231,13 @@ end
 function rednetComputers()
     local funcs = {}
     for i=1, 10 do
-        local f = (function() table.insert(filesHosts, tostring(i), rednet.lookup("files", "puzzle"..i)) end)
+        local f = (function() filesHosts[tostring(i)] = rednet.lookup("files", "puzzle"..i) end)
         table.insert(funcs, f)
     end
     parallel.waitForAll(unpack(funcs))
-    for k,v in pairs(filesHosts) do
-        print(k, v)
-    end    
 end
 
+print("Loading...")
 rednetComputers()
 
 parallel.waitForAny(resetTextEvent, basalt.run)
