@@ -27,6 +27,7 @@ local resetButton = submitResetBox:addButton()
 local puzzleSelect = main:addContainer()
 local _puzzleLabel = puzzleSelect:addLabel():setText("Select Puzzle"):setPosition(3,1):setWidth("{self.text:len() + 1}")
 local puzzle1Button = puzzleSelect:addButton()
+local activePuzzles = {true, false, false, false, false, false, false, false, false, false}
 
 -- File Picker frame initilization
 local fileFrame = main:addFrame()
@@ -85,7 +86,7 @@ local function sendFile()
         sendTimerId = os.startTimer(3)
     end
 
-    sendButton:setText("Sent!"):setBackground(color.green)
+    sendButton:setText("Sent!"):setBackground(colors.green)
     sendTimerId = os.startTimer(3)
 end
 
@@ -98,9 +99,10 @@ local function sendReset()
     end
     resetButton:setText("Sending...")
     resetButton:setBackground(colors.gray)
-    local receiver = rednet.lookup("reset", puzzleString..selectedPuzzle)
+    local receiver = filesHosts[selectedPuzzle]
     if not receiver then
         resetButton:setText("Error!"):setBackground(colors.red)
+        resetTimerId = os.startTimer(3)
         return
     end
     rednet.send(receiver, "", "reset")
@@ -161,7 +163,7 @@ end
 
 -- Creates interactable puzzle upload buttons
 for i = 0, 8 do
-    local button = puzzleSelect:addButton():setSize(buttonWidth, 1):setBackground(colors.gray)
+    local button = puzzleSelect:addButton():setSize(0,0):setBackground(colors.gray)
     button:setText(tostring(i+2))
     currentX = currentX + buttonWidth
     if currentX > width then
@@ -228,6 +230,37 @@ function resetTextEvent()
     end
 end
 
+function receiveRednet()
+    while true do
+        local id, message = rednet.receive("puzzleResponse")
+        if type(message) ~= "table" then
+            return
+        end
+        for idx, id in ipairs(message) do
+            --print(id)
+            if id+1 == 11 then
+                break
+            end
+            if activePuzzles[id+1] == false then
+                puzzleButtons[id+1]:setSize(buttonWidth, 1)
+            end
+            activePuzzles[id+1] = true
+            --print(textutils.serialize(activePuzzles))
+        end
+    end
+end
+
+function askPuzzles()
+    local controlPC
+    while true do
+        if not controlPC then
+            controlPC = rednet.lookup("puzzleRequest", "controlpc")
+        end
+        rednet.send(controlPC, "please :)", "puzzleRequest")
+        sleep(1)
+    end
+end
+
 function rednetComputers()
     local funcs = {}
     for i=1, 10 do
@@ -240,4 +273,4 @@ end
 print("Loading...")
 rednetComputers()
 
-parallel.waitForAny(resetTextEvent, basalt.run)
+parallel.waitForAny(resetTextEvent, receiveRednet, askPuzzles, basalt.run)

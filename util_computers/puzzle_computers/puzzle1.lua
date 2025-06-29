@@ -20,7 +20,6 @@ rednet.host("files", puzzle_label)
 rednet.host("reset", puzzle_label)
 
 
--- receive file function
 local function receive_file(data)
     print("Sending received program to turtle")
     fs.delete("/disk/startup") 
@@ -40,14 +39,13 @@ end
 -- these *must* be completely custom per-puzzle
 local function check_puzzle_complete() 
     -- implement custom puzzle completion logic per-puzzle
-    while not puzzle_complete do
+    while true do
         x, y, z = commands.getBlockPosition()
         y = y + 2
         z = z - 3
         block = commands.getBlockInfo(x, y, z)
         if block ~= nil then
             if block["name"] ~= "minecraft:air" then
-                -- TODO: Central computer that can control if a puzzle is complete
                 puzzle_complete = true
                 print("Puzzle completed!!")
             end
@@ -70,6 +68,19 @@ local function receive_protocol()
     end
 end
 
+local function solved_puzzle()
+    local controlPC
+    while true do 
+        if puzzle_complete then
+            if not controlPC then
+                controlPC = rednet.lookup("puzzleControl", "controlpc")
+            end
+            rednet.send(controlPC, {hostname=puzzle_label, pass="supersecretpasskey"}, "puzzleControl")
+        end
+        sleep(10)
+    end
+end
+
 -- Wait for file, reset, or if a success state is reached
 print("Waiting to receive protocols...")
-parallel.waitForAny(receive_protocol, check_puzzle_complete)
+parallel.waitForAny(receive_protocol, check_puzzle_complete, solved_puzzle)
