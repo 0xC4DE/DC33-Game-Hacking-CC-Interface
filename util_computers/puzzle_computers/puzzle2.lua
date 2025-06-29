@@ -8,8 +8,8 @@ If the user figures out a way to directly remote control the turtle, awesome lol
 ]]--
 
 -- This is used for placing the turtle, it need to be unique, otherwise it can cause... issues
-local computerId = 1000
-local puzzle_label = "puzzle1"
+local computerId = 1001
+local puzzle_label = "puzzle2"
 local puzzle_complete = false
 
 -- Find modem, open rednet
@@ -44,8 +44,9 @@ local function check_puzzle_complete()
     -- implement custom puzzle completion logic per-puzzle
     while true do
         x, y, z = commands.getBlockPosition()
+        x = x + 2 
         y = y + 2
-        z = z - 3
+        z = z - 5
         block = commands.getBlockInfo(x, y, z)
         if block ~= nil then
             if block["name"] ~= "minecraft:air" then

@@ -8,8 +8,8 @@ If the user figures out a way to directly remote control the turtle, awesome lol
 ]]--
 
 -- This is used for placing the turtle, it need to be unique, otherwise it can cause... issues
-local computerId = 1000
-local puzzle_label = "puzzle1"
+local computerId = 1008
+local puzzle_label = "puzzle9"
 local puzzle_complete = false
 
 -- Find modem, open rednet
