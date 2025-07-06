@@ -208,4 +208,26 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Two", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[
+Welcome to Puzzle 2!
+
+This puzzle is a "simple" extension to puzzle 1, but it now incorporates a turn! These should be very easy to pull off.
+
+This command you are most interested in is:
+
+                turtle.turnRight()
+
+Another command for you to remember is turtle.turnLeft(), it might come in handy later :)
+
+Remember the file can be created on your tablet, selected and sent, as long as "2" is selected!
+    
+Reminder: The API for turtles can be found at https://tweaked.cc]], true, colors.black, colors.white)
+PrimeUI.run()

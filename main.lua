@@ -147,7 +147,10 @@ local function list_files()
     local ret_files = {}
     for k, v in pairs(files) do
         if v:sub(-3) == "lua" then
-            table.insert(ret_files, v)
+            if v:sub(1,4) == "main" or v:sub(1,7) == "rawterm" or v:sub(1,6) == "basalt" then
+            else
+                table.insert(ret_files, v)
+            end
         end
     end
     return ret_files
@@ -255,8 +258,9 @@ function askPuzzles()
     while true do
         if not controlPC then
             controlPC = rednet.lookup("puzzleRequest", "controlpc")
+        else
+            rednet.send(controlPC, "please :)", "puzzleRequest")
         end
-        rednet.send(controlPC, "please :)", "puzzleRequest")
         sleep(1)
     end
 end

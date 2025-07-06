@@ -27,7 +27,7 @@ local function receive_file(data)
     fs.delete("/disk/startup") 
     local file = fs.open("/disk/startup", "w")
     file.write(data)
-    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:10,ComputerId:%i}", computerId))
+    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:50,ComputerId:%i}", computerId))
     commands.exec(string.format("computercraft turn-on %i", computerId))
     return true
 end
@@ -35,6 +35,9 @@ end
 local function receive_reset_request() 
     commands.exec(string.format("computercraft shutdown %i", computerId))
     print("I'm resetting really hard rn")
+    redstone.setOutput("right", true)
+    sleep(1)
+    redstone.setOutput("right", false)
     return true
 end
 
@@ -81,6 +84,7 @@ local function solved_puzzle()
             else
                 rednet.send(controlPC, {hostname=puzzle_label, pass="supersecretpasskey"}, "puzzleControl")
             end
+            commands.exec("scoreboard players set @p "..puzzle_label.." 1")
         end
         sleep(10)
     end

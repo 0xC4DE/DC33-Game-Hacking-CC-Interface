@@ -208,4 +208,25 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Nine", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 9!
+This puzzle focuses on a simple mechanic: inspecting what's infront of you.
+
+To complete this puzzle a turtle must first determine what block is in front of it 
+
+If it is "minecraft:gold_block" it must then: turn left, move forward, turn right, then forward twice, then inspect the next one
+Similarly, if its "minecraft:iron_block" it must then: turn right, move forward, turn left, then forward twice, then inspect the next block
+
+To inspect the block in front of you check out turtle.inspect()
+https://tweaked.cc/module/turtle.html#v:inspect
+
+Good luck!
+]], false, colors.black, colors.white)
+PrimeUI.run()

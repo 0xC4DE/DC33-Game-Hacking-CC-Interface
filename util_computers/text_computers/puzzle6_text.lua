@@ -208,4 +208,20 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Six", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 6!
+
+Welcome to puzzle 6, your goal is to take items from the chest, and place one of each in the item frames.
+
+The contents of the chest: 5 stone blocks. Make sure you are able to properly pull all of them, they may be in different slots ;)
+
+If a turtle is facing an item frame, a "place" command can put the item in the frame, be careful not to run into the frame!
+]], false, colors.black, colors.white)
+PrimeUI.run()

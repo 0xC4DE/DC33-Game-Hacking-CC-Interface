@@ -1,14 +1,6 @@
 -- PrimeUI by JackMacWindows
 -- Public domain/CC0
 
-local text = [[
-This is a computer that has information
-blah blah blah
-blah blah
-blah blah
-blah blah blah
-]]
-
 local expect = require "cc.expect".expect
 
 -- Initialization code
@@ -94,49 +86,148 @@ do
     end
 end
 
---- Creates a text box that wraps text and can have its text modified later.
----@param win window The parent window of the text box
----@param x number The X position of the box
----@param y number The Y position of the box
----@param width number The width of the box
----@param height number The height of the box
----@param text string The initial text to draw
----@param fgColor color|nil The color of the text (defaults to white)
+--- Draws a thin border around a screen region.
+---@param win window The window to draw on
+---@param x number The X coordinate of the inside of the box
+---@param y number The Y coordinate of the inside of the box
+---@param width number The width of the inner box
+---@param height number The height of the inner box
+---@param fgColor color|nil The color of the border (defaults to white)
 ---@param bgColor color|nil The color of the background (defaults to black)
----@return function redraw A function to redraw the window with new contents
-function PrimeUI.textBox(win, x, y, width, height, text, fgColor, bgColor)
+function PrimeUI.borderBox(win, x, y, width, height, fgColor, bgColor)
     expect(1, win, "table")
     expect(2, x, "number")
     expect(3, y, "number")
     expect(4, width, "number")
     expect(5, height, "number")
-    expect(6, text, "string")
-    fgColor = expect(7, fgColor, "number", "nil") or colors.white
-    bgColor = expect(8, bgColor, "number", "nil") or colors.black
-    -- Create the box window.
-    local box = window.create(win, x, y, width, height)
-    -- Override box.getSize to make print not scroll.
-    function box.getSize()
-        return width, math.huge
+    fgColor = expect(6, fgColor, "number", "nil") or colors.white
+    bgColor = expect(7, bgColor, "number", "nil") or colors.black
+    -- Draw the top-left corner & top border.
+    win.setBackgroundColor(bgColor)
+    win.setTextColor(fgColor)
+    win.setCursorPos(x - 1, y - 1)
+    win.write("\x9C" .. ("\x8C"):rep(width))
+    -- Draw the top-right corner.
+    win.setBackgroundColor(fgColor)
+    win.setTextColor(bgColor)
+    win.write("\x93")
+    -- Draw the right border.
+    for i = 1, height do
+        win.setCursorPos(win.getCursorPos() - 1, y + i - 1)
+        win.write("\x95")
     end
-    -- Define a function to redraw with.
-    local function redraw(_text)
-        expect(1, _text, "string")
-        -- Set window parameters.
-        box.setBackgroundColor(bgColor)
-        box.setTextColor(fgColor)
-        box.clear()
-        box.setCursorPos(1, 1)
-        -- Redirect and draw with `print`.
-        local old = term.redirect(box)
-        print(_text)
-        term.redirect(old)
+    -- Draw the left border.
+    win.setBackgroundColor(bgColor)
+    win.setTextColor(fgColor)
+    for i = 1, height do
+        win.setCursorPos(x - 1, y + i - 1)
+        win.write("\x95")
     end
-    redraw(text)
-    return redraw
+    -- Draw the bottom border and corners.
+    win.setCursorPos(x - 1, y + height)
+    win.write("\x8D" .. ("\x8C"):rep(width) .. "\x8E")
 end
 
+--- Draws a line of text, centering it inside a box horizontally.
+---@param win window The window to draw on
+---@param x number The X position of the left side of the box
+---@param y number The Y position of the box
+---@param width number The width of the box to draw in
+---@param text string The text to draw
+---@param fgColor color|nil The color of the text (defaults to white)
+---@param bgColor color|nil The color of the background (defaults to black)
+function PrimeUI.centerLabel(win, x, y, width, text, fgColor, bgColor)
+    expect(1, win, "table")
+    expect(2, x, "number")
+    expect(3, y, "number")
+    expect(4, width, "number")
+    expect(5, text, "string")
+    fgColor = expect(6, fgColor, "number", "nil") or colors.white
+    bgColor = expect(7, bgColor, "number", "nil") or colors.black
+    assert(#text <= width, "string is too long")
+    win.setCursorPos(x + math.floor((width - #text) / 2), y)
+    win.setTextColor(fgColor)
+    win.setBackgroundColor(bgColor)
+    win.write(text)
+end
+
+--- Draws a block of text inside a window with word wrapping, optionally resizing the window to fit.
+---@param win window The window to draw in
+---@param text string The text to draw
+---@param resizeToFit boolean|nil Whether to resize the window to fit the text (defaults to false). This is useful for scroll boxes.
+---@param fgColor color|nil The color of the text (defaults to white)
+---@param bgColor color|nil The color of the background (defaults to black)
+---@return number lines The total number of lines drawn
+function PrimeUI.drawText(win, text, resizeToFit, fgColor, bgColor)
+    expect(1, win, "table")
+    expect(2, text, "string")
+    expect(3, resizeToFit, "boolean", "nil")
+    fgColor = expect(4, fgColor, "number", "nil") or colors.white
+    bgColor = expect(5, bgColor, "number", "nil") or colors.black
+    -- Set colors.
+    win.setBackgroundColor(bgColor)
+    win.setTextColor(fgColor)
+    -- Redirect to the window to use print on it.
+    local old = term.redirect(win)
+    -- Draw the text using print().
+    local lines = print(text)
+    -- Redirect back to the original terminal.
+    term.redirect(old)
+    -- Resize the window if desired.
+    if resizeToFit then
+        -- Get original parameters.
+        local x, y = win.getPosition()
+        local w = win.getSize()
+        -- Resize the window.
+        win.reposition(x, y, w, lines)
+    end
+    return lines
+end
+
+--- Draws a horizontal line at a position with the specified width.
+---@param win window The window to draw on
+---@param x number The X position of the left side of the line
+---@param y number The Y position of the line
+---@param width number The width/length of the line
+---@param fgColor color|nil The color of the line (defaults to white)
+---@param bgColor color|nil The color of the background (defaults to black)
+function PrimeUI.horizontalLine(win, x, y, width, fgColor, bgColor)
+    expect(1, win, "table")
+    expect(2, x, "number")
+    expect(3, y, "number")
+    expect(4, width, "number")
+    fgColor = expect(5, fgColor, "number", "nil") or colors.white
+    bgColor = expect(6, bgColor, "number", "nil") or colors.black
+    -- Use drawing characters to draw a thin line.
+    win.setCursorPos(x, y)
+    win.setTextColor(fgColor)
+    win.setBackgroundColor(bgColor)
+    win.write(("\x8C"):rep(width))
+end
+
+-- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-local box = PrimeUI.textBox(monitor, 1, 1, x, y, text, colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle One", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[
+Welcome to Puzzle 1!
+
+The objective of most of these puzzles will be outlined by monitors such as this one. As you can see by the demo below, you simply need to move the turtle to the green block.
+
+Not to worry, the turtle will spawn facing the correct direction, all you have to do is move forward. 
+
+This command you are most interested in is:
+
+                turtle.moveForward()
+
+Remember the file can be created on your tablet, selected and sent, as long as "1" is selected!
+    
+Remember: The API for turtles can be found at https://tweaked.cc]], true, colors.black, colors.white)
 PrimeUI.run()

@@ -35,6 +35,9 @@ end
 local function receive_reset_request() 
     commands.exec(string.format("computercraft shutdown %i", computerId))
     print("I'm resetting really hard rn")
+    redstone.setOutput("right", true)
+    sleep(1)
+    redstone.setOutput("right", false)
     return true
 end
 
@@ -44,14 +47,17 @@ local function check_puzzle_complete()
     -- implement custom puzzle completion logic per-puzzle
     while true do
         x, y, z = commands.getBlockPosition()
-        y = y + 2
-        z = z - 3
-        block = commands.getBlockInfo(x, y, z)
-        if block ~= nil then
-            if block["name"] ~= "minecraft:air" then
-                puzzle_complete = true
-                sleepTime=10
+        y = y - 1
+        z = z - 1
+        for i = 0, 4 do
+            block = commands.getBlockInfo(x+i, y, z)
+            if block ~= nil then
+                if block.name == "minecraft:air" then
+                    break
+                end
             end
+            puzzle_complete = true
+            sleepTime=10
         end
         sleep(sleepTime)
     end
@@ -75,11 +81,14 @@ local function solved_puzzle()
     local controlPC
     while true do 
         if puzzle_complete then
+            print("Puzzle is complete")
             if not controlPC then
                 controlPC = rednet.lookup("puzzleControl", "controlpc")
             else
                 rednet.send(controlPC, {hostname=puzzle_label, pass="supersecretpasskey"}, "puzzleControl")
             end
+            commands.exec("scoreboard players set @p "..puzzle_label.." 1")
+
         end
         sleep(10)
     end

@@ -208,4 +208,20 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Seven", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 7!
+
+Turtles can output redstone signals, if you're unfamiliar, I recommend watching a video on vanilla redstone.
+
+Your goal is to trigger pistons to push the redstone block into the lamp, in the right order!
+
+Checkout the "redstone" module on the CC: Tweaked wiki to learn more, there's several options here!
+]], false, colors.black, colors.white)
+PrimeUI.run()

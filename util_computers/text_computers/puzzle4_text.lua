@@ -208,4 +208,25 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Four", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 4!
+
+This puzzle uses concepts from puzzles 1 and 2, along with a solution that can be best solved using "loops"
+
+Loops can be used to execute several instructions in series, they can be used like the following in lua:
+
+while condition do
+    [instructions]
+end
+
+note that "condition" is a boolean meaning true or false, it must be defined as a variable in the text.
+
+Here's an article about loops: https://www.computercraft.info/wiki/Loops (type in your browser.)    ]], false, colors.black, colors.white)
+PrimeUI.run()

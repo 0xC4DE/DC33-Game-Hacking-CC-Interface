@@ -208,4 +208,22 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Eight", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 8!
+You should already know all about moving materials between chests, but what about specific materials?
+
+The chest contains six different concrete blocks with ID "minecraft:COLOR_concrete" (this ID can be used with getItemDetail)
+The goal is to place one of each different block in the correct color coordinated chest shown via the signs.
+
+Useful command: turtle.getItemDetail(slotNum)
+
+All of this has to be done without knowing which slots, of course :). This is the first puzzle I'd heavily recommend replicating the puzzle in a test world.
+]], false, colors.black, colors.white)
+PrimeUI.run()

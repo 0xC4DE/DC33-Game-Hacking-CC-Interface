@@ -8,8 +8,8 @@ If the user figures out a way to directly remote control the turtle, awesome lol
 ]]--
 
 -- This is used for placing the turtle, it need to be unique, otherwise it can cause... issues
-local computerId = 1000
-local puzzle_label = "puzzle1"
+local computerId = 1009
+local puzzle_label = "puzzle10"
 local puzzle_complete = false
 
 -- Find modem, open rednet
@@ -27,7 +27,7 @@ local function receive_file(data)
     fs.delete("/disk/startup") 
     local file = fs.open("/disk/startup", "w")
     file.write(data)
-    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:10,ComputerId:%i}", computerId))
+    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=east]{Fuel:10,ComputerId:%i}", computerId))
     commands.exec(string.format("computercraft turn-on %i", computerId))
     return true
 end
@@ -38,6 +38,7 @@ local function receive_reset_request()
     redstone.setOutput("right", true)
     sleep(1)
     redstone.setOutput("right", false)
+
     return true
 end
 
@@ -47,13 +48,16 @@ local function check_puzzle_complete()
     -- implement custom puzzle completion logic per-puzzle
     while true do
         x, y, z = commands.getBlockPosition()
+        x = x + 4
         y = y + 2
-        z = z - 3
+        z = z + 1
         block = commands.getBlockInfo(x, y, z)
         if block ~= nil then
             if block["name"] ~= "minecraft:air" then
-                puzzle_complete = true
-                sleepTime=10
+                if block.state.lit then
+                    puzzle_complete = true
+                    sleepTime=10
+                end
             end
         end
         sleep(sleepTime)
@@ -83,7 +87,8 @@ local function solved_puzzle()
             else
                 rednet.send(controlPC, {hostname=puzzle_label, pass="supersecretpasskey"}, "puzzleControl")
             end
-            commands.exec("scoreboard players set @p puzzle1 1")
+            commands.exec("scoreboard players set @p "..puzzle_label.." 1")
+
         end
         sleep(10)
     end

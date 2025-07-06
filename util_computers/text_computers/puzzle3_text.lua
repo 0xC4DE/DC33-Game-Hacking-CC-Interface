@@ -208,4 +208,25 @@ end
 -- YOUR CODE HERE
 local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
-PrimeUI.centerLabel(monitor, 1, 1, 14, "Puzzle One", colors.black, colors.white)
+monitor.setBackgroundColor(colors.white)
+monitor.clear()
+PrimeUI.centerLabel(monitor, 1, 2, x, "Puzzle Three", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
+PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
+local textWin = window.create(monitor, 3, 6, x-4, y-6)
+textWin.setBackgroundColor(colors.white)
+textWin.clear()
+PrimeUI.drawText(textWin, [[Welcome to Puzzle 3!
+This puzzle introduces interacting with chests.
+
+Inside of the first chest there is a block, it doesn't particularly matter what block, the block needs to be inserted into the chest at the end of the line.
+
+The command you're interested in is:
+    turtle.suck() and turtle.drop()
+
+Drop will normally drop items on the ground, unless it is facing a chest.
+You can check if there's a chest in front of the turtle using peripheral.wrap(direction), this will return "nil" if there is no chest there!
+(there might be useful functions there too ;)
+
+More information at https://tweaked.cc/module/turtle.html (type in your browser.)]], true, colors.black, colors.white)
+PrimeUI.run()

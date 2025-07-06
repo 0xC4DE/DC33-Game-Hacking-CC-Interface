@@ -35,6 +35,9 @@ end
 local function receive_reset_request() 
     commands.exec(string.format("computercraft shutdown %i", computerId))
     print("I'm resetting really hard rn")
+    redstone.setOutput("right", true)
+    sleep(1)
+    redstone.setOutput("right", false)
     return true
 end
 
@@ -44,14 +47,43 @@ local function check_puzzle_complete()
     -- implement custom puzzle completion logic per-puzzle
     while true do
         x, y, z = commands.getBlockPosition()
-        y = y + 2
-        z = z - 3
-        block = commands.getBlockInfo(x, y, z)
-        if block ~= nil then
-            if block["name"] ~= "minecraft:air" then
-                puzzle_complete = true
-                sleepTime=10
+        chest1 = {x=x, y=y+2, z=z-2} -- green
+        chest2 = {x=x, y=y+4, z=z-2} -- red
+        chest3 = {x=x+3, y=y+2, z=z-2} -- yellow
+        chest4 = {x=x+3, y=y+4, z=z-2} -- purple
+        chest5 = {x=x+6, y=y+2, z=z-2} -- cyan
+        chest6 = {x=x+6, y=y+4, z=z-2} -- orange
+        chests = {chest1, chest2, chest3, chest4, chest5, chest6}
+        chestColors = {"green", "red", "yellow", "purple", "cyan", "orange"} -- indexed, I hope
+
+        if not puzzle_complete then
+            for idx, chest in pairs(chests) do
+                block = commands.getBlockInfo(chest.x, chest.y, chest.z)
+                if block["name"] == "minecraft:chest" then
+                    if #block["nbt"]["Items"] >= 1 then
+                        loopBroke=false
+                        for __idx, item in pairs(block["nbt"]["Items"]) do
+                            if item.id ~= "minecraft:"..chestColors[idx].."_concrete" then
+                                print(item.id)
+                                print("minecraft:"..chestColors[idx].."_concrete")
+                                print("Puzzle broke on "..chest.x.." "..chest.y.." "..chest.z)
+                                loopBroke=true
+                                break
+                            end
+                        end
+
+                        if loopBroke then
+                            break
+                        end
+
+                        print("Puzzle Completed")
+                        puzzle_complete = true
+                        sleepTime=10
+                    end
+                end
             end
+        else
+            print("Puzzle Complete")
         end
         sleep(sleepTime)
     end
@@ -80,6 +112,8 @@ local function solved_puzzle()
             else
                 rednet.send(controlPC, {hostname=puzzle_label, pass="supersecretpasskey"}, "puzzleControl")
             end
+            commands.exec("scoreboard players set @p "..puzzle_label.." 1")
+
         end
         sleep(10)
     end
