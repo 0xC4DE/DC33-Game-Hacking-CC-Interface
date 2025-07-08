@@ -275,8 +275,10 @@ function rednetComputers()
 end
 
 function doLookupPeriodically()
-    rednetComputers()
-    sleep(30)
+    while true do
+        rednetComputers()
+        sleep(30)
+    end
 end
 
 print("Loading...")
