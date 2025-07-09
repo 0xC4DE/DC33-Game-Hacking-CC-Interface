@@ -224,6 +224,9 @@ Once loaded, the the top of the screen will have a "select puzzle" with a series
 The solution script must exist on the computer, and must be selected using the file selection in the middle of the screen to be used. The easiest way to use these files is to create them in another program, then import them into the computer.
 
 Finally there's a reset and send buton. The Reset button will fully restart the puzzle, resetting all interior blocks, fresh to be solved again.
+
+Keep in mind, if your solution fails, it may become unsolvable until you reset!
+
 The send button, as previously mentioned will send the selected script to the selected puzzle to be run by the turtle.
 
 More information (and pictures) are available on GameHacking.gg

@@ -1,0 +1,1 @@
+execute if entity @a[nbt=!{Inventory:[{id:"computercraft:pocket_computer_advanced"}]}] run give @a computercraft:pocket_computer_advanced[computercraft:pocket_upgrade={"id":"computercraft:wireless_modem_normal"},computercraft:computer_id=49] 1

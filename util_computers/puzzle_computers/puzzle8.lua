@@ -27,7 +27,7 @@ local function receive_file(data)
     fs.delete("/disk/startup") 
     local file = fs.open("/disk/startup", "w")
     file.write(data)
-    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:10,ComputerId:%i}", computerId))
+    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=north]{Fuel:100,ComputerId:%i}", computerId))
     commands.exec(string.format("computercraft turn-on %i", computerId))
     return true
 end
@@ -56,31 +56,31 @@ local function check_puzzle_complete()
         chests = {chest1, chest2, chest3, chest4, chest5, chest6}
         chestColors = {"green", "red", "yellow", "purple", "cyan", "orange"} -- indexed, I hope
 
+        local loopBroke = false
         if not puzzle_complete then
             for idx, chest in pairs(chests) do
                 block = commands.getBlockInfo(chest.x, chest.y, chest.z)
                 if block["name"] == "minecraft:chest" then
                     if #block["nbt"]["Items"] >= 1 then
-                        loopBroke=false
                         for __idx, item in pairs(block["nbt"]["Items"]) do
                             if item.id ~= "minecraft:"..chestColors[idx].."_concrete" then
                                 print(item.id)
                                 print("minecraft:"..chestColors[idx].."_concrete")
                                 print("Puzzle broke on "..chest.x.." "..chest.y.." "..chest.z)
-                                loopBroke=true
+                                loopBroke = true
                                 break
                             end
                         end
-
-                        if loopBroke then
-                            break
-                        end
-
-                        print("Puzzle Completed")
-                        puzzle_complete = true
-                        sleepTime=10
+                    else
+                        loopBroke = true
+                        break
                     end
                 end
+            end
+            if not loopBroke then
+                print("Puzzle Completed")
+                puzzle_complete = true
+                sleepTime=10
             end
         else
             print("Puzzle Complete")

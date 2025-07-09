@@ -1,0 +1,1 @@
+Here's all the solutions to the puzzles, some are longer than others, some are shorter. Yipee!

@@ -1,0 +1,10 @@
+scoreboard players set @a puzzle1 1
+scoreboard players set @a puzzle2 1
+scoreboard players set @a puzzle3 1
+scoreboard players set @a puzzle4 1
+scoreboard players set @a puzzle5 1
+scoreboard players set @a puzzle6 1
+scoreboard players set @a puzzle7 1
+scoreboard players set @a puzzle8 1
+scoreboard players set @a puzzle9 1
+scoreboard players set @a puzzle10 1

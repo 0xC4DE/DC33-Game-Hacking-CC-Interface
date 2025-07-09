@@ -225,7 +225,7 @@ Not to worry, the turtle will spawn facing the correct direction, all you have t
 
 This command you are most interested in is:
 
-                turtle.moveForward()
+                turtle.forward()
 
 Remember the file can be created on your tablet, selected and sent, as long as "1" is selected!
     
