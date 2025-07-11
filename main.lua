@@ -274,7 +274,14 @@ function rednetComputers()
     parallel.waitForAll(unpack(funcs))
 end
 
+function doLookupPeriodically()
+    while true do
+        rednetComputers()
+        sleep(30)
+    end
+end
+
 print("Loading...")
 rednetComputers()
 
-parallel.waitForAny(resetTextEvent, receiveRednet, askPuzzles, basalt.run)
+parallel.waitForAny(resetTextEvent, receiveRednet, askPuzzles, doLookupPeriodically, basalt.run)

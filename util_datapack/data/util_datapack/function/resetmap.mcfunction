@@ -8,3 +8,4 @@ scoreboard players set @a puzzle7 0
 scoreboard players set @a puzzle8 0
 scoreboard players set @a puzzle9 0
 scoreboard players set @a puzzle10 0
+setblock 83 -60 15 minecraft:redstone_block
