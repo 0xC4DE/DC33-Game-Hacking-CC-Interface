@@ -47,20 +47,25 @@ local function check_puzzle_complete()
     local sleepTime = 1 
     -- implement custom puzzle completion logic per-puzzle
     while true do
-        x, y, z = commands.getBlockPosition()
-        y = y - 1
-        z = z - 1
-        for i = 0, 4 do
-            block = commands.getBlockInfo(x+i, y, z)
-            if block ~= nil then
-                if block.name == "minecraft:air" then
-                    break
+        if not puzzle_complete then
+            x, y, z = commands.getBlockPosition()
+            y = y - 1
+            z = z - 1
+            for i = 0, 4 do
+                block = commands.getBlockInfo(x+i, y, z)
+                if block ~= nil then
+                    if block.name == "minecraft:air" then
+                        break
+                    end
                 end
+                puzzle_complete = true
+                commands.exec("playsound minecraft:entity.player.levelup player @a")
+                commands.exec("title @a subtitle \"Puzzle 6\"")
+                commands.exec("title @a title \"Puzzle Complete\"")
+                sleepTime=10
             end
-            puzzle_complete = true
-            sleepTime=10
+            sleep(sleepTime)
         end
-        sleep(sleepTime)
     end
     return true
 end 

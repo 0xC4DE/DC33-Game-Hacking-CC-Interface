@@ -47,16 +47,21 @@ local function check_puzzle_complete()
     local sleepTime = 1 
     -- implement custom puzzle completion logic per-puzzle
     while true do
-        x, y, z = commands.getBlockPosition()
-        y = y + 2
-        z = z - 10
-        block = commands.getBlockInfo(x, y, z)
-        if block ~= nil then
-            if block["name"] == "minecraft:chest" then
-                if #block["nbt"]["Items"] >= 1 then
-                    print("Puzzle Complete")
-                    puzzle_complete = true
-                    sleepTime=10
+        if not puzzle_complete then
+            x, y, z = commands.getBlockPosition()
+            y = y + 2
+            z = z - 10
+            block = commands.getBlockInfo(x, y, z)
+            if block ~= nil then
+                if block["name"] == "minecraft:chest" then
+                    if #block["nbt"]["Items"] >= 1 then
+                        print("Puzzle Complete")
+                        puzzle_complete = true
+                        commands.exec("playsound minecraft:entity.player.levelup player @a")
+                        commands.exec("title @a subtitle \"Puzzle 3\"")
+                        commands.exec("title @a title \"Puzzle Complete\"")
+                        sleepTime=10
+                    end
                 end
             end
         end

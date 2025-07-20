@@ -210,25 +210,25 @@ local monitor = peripheral.find("monitor")
 local x, y = monitor.getSize()
 monitor.setBackgroundColor(colors.white)
 monitor.clear()
-PrimeUI.centerLabel(monitor, 1, 2, x, "Solving Puzzles", colors.black, colors.white)
-PrimeUI.horizontalLine(monitor, 1, 4, x, colors.black, colors.white)
-PrimeUI.borderBox(monitor, 3, 6, x-4, y-6, colors.black, colors.white)
-local textWin = window.create(monitor, 3, 6, x-4, y-6)
+PrimeUI.centerLabel(monitor, 1, 1, x, "Solving Puzzles", colors.black, colors.white)
+PrimeUI.horizontalLine(monitor, 1, 2, x, colors.black, colors.white)
+local textWin = window.create(monitor, 1, 3, x, y)
 textWin.setBackgroundColor(colors.white)
 textWin.clear()
-PrimeUI.drawText(textWin, [[You'll notice a "pocket computer" in your inventory, this is how you will send your solution scripts to the computers. To do this the "main" program must be run simply by typing "main"
-This script can be terminated using the cross in the GUI or by pressing CTRL+T while in the GUI.
+PrimeUI.drawText(textWin, [[The solutions for puzzles will differ, some of them will have the turtle navigate to a green "end block", others will require other tasks, be sure to read the task boards located at each puzzle.
+All turtles will start above the grey "disk drive" block, for the first few puzzles these starting locations will be pointed out via a sign.
+
+All solutions must also be sent from the pocket computer present in your inventory. This can be interacted with a simple "right click" while holding it.
+
+Since all of your solutions are going to be sent from the pocket computer, they must exist on the computer in the first place. Any puzzles solutions can be created outside of the game, and then import them into the computer. 
+One method is simply clicking and draging a file from your local PC, onto the computer screen while the terminal shows only a "> _", other methods include using the "import" or "pastebin" command.
+
+The interface for sending these files to the turtles in order to solve puzzles note that this script can be terminated by clicking the cross in the GUI or by pressing CTRL+T while in the GUI.
 
 Once loaded, the the top of the screen will have a "select puzzle" with a series of buttons, initially only "1" will be visible, you select the number corresponding to your current puzzle to select a target for a particular solution script.
 
-The solution script must exist on the computer, and must be selected using the file selection in the middle of the screen to be used. The easiest way to use these files is to create them in another program, then import them into the computer.
-
-Finally there's a reset and send buton. The Reset button will fully restart the puzzle, resetting all interior blocks, fresh to be solved again.
-
-Keep in mind, if your solution fails, it may become unsolvable until you reset!
-
+Finally there's a reset and send buton. The Reset button will fully restart the puzzle, resetting all interior blocks.
 The send button, as previously mentioned will send the selected script to the selected puzzle to be run by the turtle.
-
 More information (and pictures) are available on GameHacking.gg
-]], true, colors.black, colors.white)
+]], false, colors.black, colors.white)
 PrimeUI.run()

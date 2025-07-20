@@ -81,14 +81,16 @@ local function check_puzzle_complete()
             if not loopBroke then
                 print("Puzzle Completed")
                 puzzle_complete = true
+                commands.exec("playsound minecraft:entity.player.levelup player @a")
+                commands.exec("title @a subtitle \"Puzzle 4\"")
+                commands.exec("title @a title \"Puzzle Complete\"")
                 sleepTime=10
             end
         else
             print("Puzzle Complete")
+            sleep(sleepTime)
         end
-        sleep(sleepTime)
     end
-    return true
 end 
 
 -- Receive any protocol

@@ -1,3 +1,3 @@
-turtle.moveForward()
-turtle.moveForward()
-turtle.moveForward()
+turtle.forward()
+turtle.forward()
+turtle.forward()

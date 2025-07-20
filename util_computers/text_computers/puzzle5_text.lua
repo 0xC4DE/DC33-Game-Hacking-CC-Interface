@@ -222,7 +222,9 @@ This is more of a transitional stage, it barely gets to be called a puzzle. The 
 
 Your goal is to flip the lever, thanks to a handy datapack on this world, turtles can interact with levers! (they usually cant!)
 
-Your magic command is:
-    turtle.place()
+The only catch is that the turtle must be holding an item in its active slot, luckily you've learned how turtles can pick up items from chests. Make sure you do it in the right direction!
+
+Lever flipping command done by:
+                turtle.place()
 ]], false, colors.black, colors.white)
 PrimeUI.run()

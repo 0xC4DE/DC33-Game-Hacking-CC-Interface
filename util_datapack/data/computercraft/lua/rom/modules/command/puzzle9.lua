@@ -47,14 +47,16 @@ local function check_puzzle_complete()
     local sleepTime = 1 
     -- implement custom puzzle completion logic per-puzzle
     while true do
-        x, y, z = commands.getBlockPosition()
-        y = y + 2
-        z = z + 17
-        block = commands.getBlockInfo(x, y, z)
-        if block ~= nil then
-            if block["name"] ~= "minecraft:air" then
-                puzzle_complete = true
-                sleepTime=10
+        if not puzzle_complete
+            x, y, z = commands.getBlockPosition()
+            y = y + 2
+            z = z + 17
+            block = commands.getBlockInfo(x, y, z)
+            if block ~= nil then
+                if block["name"] ~= "minecraft:air" then
+                    puzzle_complete = true
+                    sleepTime=10
+                end
             end
         end
         sleep(sleepTime)
