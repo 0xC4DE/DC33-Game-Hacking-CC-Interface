@@ -66,6 +66,7 @@ local function check_puzzle_complete()
             end
             sleep(sleepTime)
         end
+        sleep(sleepTime)
     end
     return true
 end 

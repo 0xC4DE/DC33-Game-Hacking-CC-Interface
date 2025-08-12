@@ -47,7 +47,7 @@ local function check_puzzle_complete()
     local sleepTime = 1 
     -- implement custom puzzle completion logic per-puzzle
     while true do
-        if not puzzle_complete
+        if not puzzle_complete then
             x, y, z = commands.getBlockPosition()
             y = y + 2
             z = z + 17

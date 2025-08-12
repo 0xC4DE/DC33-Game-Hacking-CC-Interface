@@ -1,4 +1,6 @@
 --[[
+This file went un-used, it's part of an old infrastructure that didn't end up working out for various reasons.
+
 This is the code that goes on a turtle that is "receiving" a transmission of code,
 This file should be named startup.lua and should be placed on a turtle that is 
 set to receive a solution for a puzzle. 
