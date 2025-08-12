@@ -40,4 +40,4 @@ luac.out
 *.hex
 
 basalt.lua
-util_datapack\data\computercraft\lua\rom\modules\command\*
+/util_datapack/data/computercraft/lua/rom/modules/command/*
