@@ -4,4 +4,5 @@ This is the repo that has all of the files that are relevant to the computer cra
 
 There isn't much context to many of the files, however I do have this singular screenshot explaining the infrastructure of each puzzle.
 
-![Infrastructure photo][ComputerCraftLab.png]
+
+![Infrastructure photo](ComputerCraftLab.png)
