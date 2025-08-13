@@ -28,7 +28,7 @@ local function receive_file(data)
     fs.delete("/disk/startup") 
     local file = fs.open("/disk/startup", "w")
     file.write(data)
-    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=east]{Fuel:10,ComputerId:%i}", computerId))
+    commands.exec(string.format("setblock ~ ~2 ~ computercraft:turtle_advanced[facing=east]{Fuel:10000,ComputerId:%i}", computerId))
     commands.exec(string.format("computercraft turn-on %i", computerId))
     return true
 end
