@@ -59,6 +59,9 @@ local function check_puzzle_complete()
                     if block.state.lit then
                         puzzle_complete = true
                         sleepTime=10
+                        commands.exec("playsound minecraft:entity.player.levelup player @a")
+                        commands.exec("title @a subtitle \"Puzzle 10\"")
+                        commands.exec("title @a title \"Puzzle Complete\"")
                     end
                 end
             end

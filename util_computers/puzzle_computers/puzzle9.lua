@@ -56,6 +56,9 @@ local function check_puzzle_complete()
                 if block["name"] ~= "minecraft:air" then
                     puzzle_complete = true
                     sleepTime=10
+                    commands.exec("playsound minecraft:entity.player.levelup player @a")
+                    commands.exec("title @a subtitle \"Puzzle 9\"")
+                    commands.exec("title @a title \"Puzzle Complete\"")
                 end
             end
         end

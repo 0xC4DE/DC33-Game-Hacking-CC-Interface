@@ -82,7 +82,7 @@ local function check_puzzle_complete()
                 print("Puzzle Completed")
                 puzzle_complete = true
                 commands.exec("playsound minecraft:entity.player.levelup player @a")
-                commands.exec("title @a subtitle \"Puzzle 4\"")
+                commands.exec("title @a subtitle \"Puzzle 8\"")
                 commands.exec("title @a title \"Puzzle Complete\"")
                 sleepTime=10
             end
